@@ -12,11 +12,6 @@
  */
 package com.sun.jna;
 
-import java.awt.Component;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
-import java.awt.Window;
-
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
@@ -232,47 +227,47 @@ public final class Native {
      */
     public static synchronized native boolean getPreserveLastError();
     
-    /** Utility method to get the native window ID for a Java {@link Window}
-     * as a <code>long</code> value.
-     * This method is primarily for X11-based systems, which use an opaque
-     * <code>XID</code> (usually <code>long int</code>) to identify windows.
-     * @throws HeadlessException if the current VM is running headless 
-     */
-    public static long getWindowID(Window w) throws HeadlessException {
-        return AWT.getWindowID(w);
-    }
-
-    /** Utility method to get the native window ID for a heavyweight Java 
-     * {@link Component} as a <code>long</code> value.
-     * This method is primarily for X11-based systems, which use an opaque
-     * <code>XID</code> (usually <code>long int</code>) to identify windows. 
-     * @throws HeadlessException if the current VM is running headless 
-     */
-    public static long getComponentID(Component c) throws HeadlessException {
-        return AWT.getComponentID(c);
-    }
-    
-    /** Utility method to get the native window pointer for a Java 
-     * {@link Window} as a {@link Pointer} value.  This method is primarily for 
-     * w32, which uses the <code>HANDLE</code> type (actually 
-     * <code>void *</code>) to identify windows. 
-     * @throws HeadlessException if the current VM is running headless 
-     */
-    public static Pointer getWindowPointer(Window w) throws HeadlessException {
-        return new Pointer(AWT.getWindowID(w));
-    }
-    
-    /** Utility method to get the native window pointer for a heavyweight Java 
-     * {@link Component} as a {@link Pointer} value.  This method is primarily 
-     * for w32, which uses the <code>HWND</code> type (actually 
-     * <code>void *</code>) to identify windows. 
-     * @throws HeadlessException if the current VM is running headless 
-     */
-    public static Pointer getComponentPointer(Component c) throws HeadlessException {
-        return new Pointer(AWT.getComponentID(c));
-    }
-    
-    static native long getWindowHandle0(Component c);
+//    /** Utility method to get the native window ID for a Java {@link Window}
+//     * as a <code>long</code> value.
+//     * This method is primarily for X11-based systems, which use an opaque
+//     * <code>XID</code> (usually <code>long int</code>) to identify windows.
+//     * @throws HeadlessException if the current VM is running headless
+//     */
+//    public static long getWindowID(Window w) throws HeadlessException {
+//        return AWT.getWindowID(w);
+//    }
+//
+//    /** Utility method to get the native window ID for a heavyweight Java
+//     * {@link Component} as a <code>long</code> value.
+//     * This method is primarily for X11-based systems, which use an opaque
+//     * <code>XID</code> (usually <code>long int</code>) to identify windows.
+//     * @throws HeadlessException if the current VM is running headless
+//     */
+//    public static long getComponentID(Component c) throws HeadlessException {
+//        return AWT.getComponentID(c);
+//    }
+//
+//    /** Utility method to get the native window pointer for a Java
+//     * {@link Window} as a {@link Pointer} value.  This method is primarily for
+//     * w32, which uses the <code>HANDLE</code> type (actually
+//     * <code>void *</code>) to identify windows.
+//     * @throws HeadlessException if the current VM is running headless
+//     */
+//    public static Pointer getWindowPointer(Window w) throws HeadlessException {
+//        return new Pointer(AWT.getWindowID(w));
+//    }
+//
+//    /** Utility method to get the native window pointer for a heavyweight Java
+//     * {@link Component} as a {@link Pointer} value.  This method is primarily
+//     * for w32, which uses the <code>HWND</code> type (actually
+//     * <code>void *</code>) to identify windows.
+//     * @throws HeadlessException if the current VM is running headless
+//     */
+//    public static Pointer getComponentPointer(Component c) throws HeadlessException {
+//        return new Pointer(AWT.getComponentID(c));
+//    }
+//
+//    static native long getWindowHandle0(Component c);
 
     /** Convert a direct {@link Buffer} into a {@link Pointer}. 
      * @throws IllegalArgumentException if the buffer is not direct.
@@ -1731,39 +1726,6 @@ public final class Native {
     private static class Buffers {
         static boolean isBuffer(Class cls) {
             return Buffer.class.isAssignableFrom(cls);
-        }
-    }
-
-    /** Provides separation of JAWT functionality for the sake of J2ME
-     * ports which do not include AWT support.
-     */
-    private static class AWT {
-        static long getWindowID(Window w) throws HeadlessException {
-            return getComponentID(w);
-        }
-        // Declaring the argument as Object rather than Component avoids class not
-        // found errors on phoneME foundation profile.
-        static long getComponentID(Object o) throws HeadlessException {
-            if (GraphicsEnvironment.isHeadless()) {
-                throw new HeadlessException("No native windows when headless");
-            }
-            Component c = (Component)o;
-            if (c.isLightweight()) {
-                throw new IllegalArgumentException("Component must be heavyweight");
-            }
-            if (!c.isDisplayable()) 
-                throw new IllegalStateException("Component must be displayable");
-            // On X11 VMs prior to 1.5, the window must be visible
-            if (Platform.isX11()
-                && System.getProperty("java.version").startsWith("1.4")) {
-                if (!c.isVisible()) {
-                    throw new IllegalStateException("Component must be visible");
-                }
-            }
-            // By this point, we're certain that Toolkit.loadLibraries() has
-            // been called, thus avoiding AWT/JAWT link errors
-            // (see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6539705).
-            return Native.getWindowHandle0(c);
         }
     }
 }
