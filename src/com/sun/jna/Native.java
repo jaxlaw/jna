@@ -267,7 +267,7 @@ public final class Native {
 //        return new Pointer(AWT.getComponentID(c));
 //    }
 //
-//    static native long getWindowHandle0(Component c);
+    static native long getWindowHandle0(Object c);
 
     /** Convert a direct {@link Buffer} into a {@link Pointer}. 
      * @throws IllegalArgumentException if the buffer is not direct.
